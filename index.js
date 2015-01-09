@@ -3,11 +3,13 @@ var r;
 
 var helper;
 
-function init(options, driver) {
-    r = driver
+function init(driver, options) {
     var defaultDb = 'test'
+    if (!driver) rethinkError('Please include the rethinkdb driver when calling init')
     if (!options) options = {db: defaultDb}
     if (!options.db) options.db = defaultDb
+
+    r = driver
 
     helper = {
         connection: null,
