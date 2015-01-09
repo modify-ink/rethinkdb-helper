@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/isaachess/rethinkdb-helper/issues"
   },
-  "homepage": "https://github.com/isaachess/rethinkdb-helper"
+  "homepage": "https://github.com/isaachess/rethinkdb-helper",
+  "dependencies": {
+    "q": "^1.1.2",
+    "rethinkdb": "^1.15.0-0"
+  }
 }
