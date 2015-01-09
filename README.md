@@ -12,21 +12,25 @@ It's very simple to use.
 
 ## Require necessary items
 
-    var r = require('rethinkdb')
-    var rdbHelper = require('rethinkdb-helper')
+```javascript
+var r = require('rethinkdb')
+var rdbHelper = require('rethinkdb-helper')
+```
 
 ## Init connection object
 
 The `init` method takes two arguments: your rethinkdb driver, and connection options object:
 
-    var options = {
-        db: 'test',
-        // etc... all connection options are supported here
-    }
+```javascript
+var options = {
+    db: 'test',
+    // etc... all connection options are supported here
+}
 
-    // When you establish the connection, pass in your rethinkdb driver
-    // so that it can use whatever driver version you want
-    var connection = rdbHelper.init(r, options)
+// When you establish the connection, pass in your rethinkdb driver
+// so that it can use whatever driver version you want
+var connection = rdbHelper.init(r, options)
+```
 
 # Connection Object
 
