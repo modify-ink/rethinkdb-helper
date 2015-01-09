@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/isaachess/rethinkdb-helper",
   "dependencies": {
-    "q": "^1.1.2",
-    "rethinkdb": "^1.15.0-0"
+    "q": "^1.1.2"
   }
 }

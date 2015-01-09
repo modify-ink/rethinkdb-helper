@@ -1,21 +1,21 @@
-var r = require('rethinkdb')
-var q = require('q')
+var q = require('q');
+var r;
 
-var connection;
-var options;
+var helper;
 
-function init(optns) {
+function init(options, driver) {
+    r = driver
     var defaultDb = 'test'
-    if (!optns) optns = {db: defaultDb}
-    if (!optns.db) optns.db = defaultDb
-    options = optns
+    if (!options) options = {db: defaultDb}
+    if (!options.db) options.db = defaultDb
 
-    return {
-        connection: connection,
+    helper = {
+        connection: null,
         options: options,
         connect: connect,
         run: run
     }
+    return helper
 }
 
 /*
@@ -30,32 +30,33 @@ function init(optns) {
 function connect() {
     // Make connection
     var d = q.defer()
-    r.connect(options, function(err, conn) {
+    r.connect(helper.options, function(err, conn) {
         if (err) rethinkError(err, d)
-        connection = conn
-        console.log('rethinkdb connection established for:', options)
+        helper.connection = conn
+        console.log('rethinkdb connection established for:', helper.options)
 
         // Create db. If it exists it will fail silently, if not will be created.
-        r.dbCreate(options.db).run(connection, function(err, result) {
+        r.dbCreate(helper.options.db).run(helper.connection, function(err, result) {
             // Ignore error, it's probably an 'already created' error
-            connection.use(options.db)
-            d.resolve(connection)
+            helper.connection.use(helper.options.db)
+            d.resolve(helper.connection)
         })
     })
     return d.promise
 }
 
 /*
- * Run -- takes rethinkdb sequence to run on the database.
+ * Run -- takes rethinkdb query to run on the database.
  * Returns -- promise which resolves to json requested from db.
  *
- * It handles the cursors nicely so you don't have to deal with them.
+ * It handles the cursors and array transformations nicely so
+ * you don't have to deal with them.
 */
 
-function run(sequence) {
+function run(query) {
     var d = q.defer()
-    sequence.run(connection, function(err, cursor) {
-        if (err) rethinkError(err, d)
+    query.run(helper.connection, function(err, cursor) {
+        if (err) d.reject(err)
         else {
             // If cursor can be converted to array, do that
             if (cursor && cursor.toArray) {
