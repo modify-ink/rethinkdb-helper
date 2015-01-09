@@ -2,6 +2,21 @@ var r = require('rethinkdb')
 var q = require('q')
 
 var connection;
+var options;
+
+function init(optns) {
+    var defaultDb = 'test'
+    if (!optns) optns = {db: defaultDb}
+    if (!optns.db) optns.db = defaultDb
+    options = optns
+
+    return {
+        connection: connection,
+        options: options,
+        connect: connect,
+        run: run
+    }
+}
 
 /*
  * Connect -- takes options object. It supports all options specified by
@@ -12,14 +27,7 @@ var connection;
  * Returns -- promise which resolves to the connection object
 */
 
-function connect(options) {
-
-    // Require db in options object
-    if (!options.db) {
-        rethinkError('please specify db in options object')
-        return null
-    }
-
+function connect() {
     // Make connection
     var d = q.defer()
     r.connect(options, function(err, conn) {
@@ -68,6 +76,4 @@ function rethinkError(error, defer) {
     console.log('rethinkdb-helper error', error)
 }
 
-exports.connection = connection;
-exports.connect = connect;
-exports.run = run;
+exports.init = init;
