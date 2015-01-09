@@ -20,13 +20,12 @@ function connect(options) {
         return null
     }
 
-    console.log('rethinkdb connection for:', options)
-
     // Make connection
     var d = q.defer()
     r.connect(options, function(err, conn) {
         if (err) rethinkError(err, d)
         connection = conn
+        console.log('rethinkdb connection established for:', options)
 
         // Create db. If it exists it will fail silently, if not will be created.
         r.dbCreate(options.db).run(connection, function(err, result) {
