@@ -54,31 +54,34 @@ This is simply the options object you passed in, in case you need access to any 
 
 # Examples
 
-    var r = require('rethinkdb')
-    var rdbHelper = require('rethinkdb-helper')
+```javascript
+var r = require('rethinkdb')
+var rdbHelper = require('rethinkdb-helper')
 
-    var dbOptions = {
-        db: 'test',
-        host: 'localhost',
-        port: 28015
-    }
+var dbOptions = {
+    db: 'test',
+    host: 'localhost',
+    port: 28015
+}
 
-    var connection = rdbHelper.init(r, dbOptions)
+var connection = rdbHelper.init(r, dbOptions)
 
-    // establish connection
-    connection.connect().then(function(connection) {
-        // Do something with the connection if you want ... or just something
-        // after the connection is complete
-    })
+// establish connection
+connection.connect().then(function(connection) {
+    // Do something with the connection if you want ... or just something
+    // after the connection is complete
+})
 
-    // simple query run
-    var query = r.table('users').get('15d-2d4-12a')
-    connection.run(query).then(function(user) {
-        // direct access to user object
-    })
+// simple query run
+var query = r.table('users').get('15d-2d4-12a')
+connection.run(query).then(function(user) {
+    // direct access to user object
+})
 
-    // get an array without dealing with cursors
-    var query = r.table('users').filter({firstName: 'John'}) // all users called John
-    connection.run(query).then(function(users) {
-        // The 'run' method is smart and turns cursors into arrays for you
-    })
+// get an array without dealing with cursors
+var query = r.table('users').filter({firstName: 'John'}) // all users called John
+connection.run(query).then(function(users) {
+    // You now have an array of users
+    // The 'run' method is smart and turns cursors into arrays for you
+})
+```
