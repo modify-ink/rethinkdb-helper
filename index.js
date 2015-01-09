@@ -64,7 +64,7 @@ function run(sequence) {
     return d.promise
 }
 
-function nethinkError(error, defer) {
+function rethinkError(error, defer) {
     if (defer) defer.reject(error)
     console.log('rethinkdb-helper error', error)
 }
