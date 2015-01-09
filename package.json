@@ -1,7 +1,7 @@
 {
   "name": "rethinkdb-helper",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "A simple rethinkdb connection helper to easily connect, run queries, and deal with cursors.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,5 +18,11 @@
   "homepage": "https://github.com/isaachess/rethinkdb-helper",
   "dependencies": {
     "q": "^1.1.2"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [
+    "rethinkdb",
+    "connection",
+    "helper"
+  ]
 }
