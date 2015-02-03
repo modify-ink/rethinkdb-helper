@@ -1,82 +1,77 @@
-var q = require('q');
+var poolModule = require('generic-pool');
+var Promise = require('bluebird');
 var r;
-
 var helper;
+
+var internals = {};
 
 function init(driver, options) {
     var defaultDb = 'test'
+    internals.options = options || {}
     if (!driver) rethinkError('Please include the rethinkdb driver when calling init')
-    if (!options) options = {db: defaultDb}
     if (!options.db) options.db = defaultDb
 
     r = driver
 
-    helper = {
-        connection: null,
-        options: options,
-        connect: connect,
-        run: run
-    }
-    return helper
-}
-
-/*
- * Connect -- takes options object. It supports all options specified by
- * rethinkdb, but requires you specify the database to connect to. If
- * you want to connect to the default 'test' database, you still must
- * specify it.
- *
- * Returns -- promise which resolves to the connection object
-*/
-
-function connect() {
-    // Make connection
-    var d = q.defer()
-    r.connect(helper.options, function(err, conn) {
-        if (err) rethinkError(err, d)
-        helper.connection = conn
-        console.log('rethinkdb connection established for:', helper.options)
-
-        // Create db. If it exists it will fail silently, if not will be created.
-        r.dbCreate(helper.options.db).run(helper.connection, function(err, result) {
-            // Ignore error, it's probably an 'already created' error
-            helper.connection.use(helper.options.db)
-            d.resolve(helper.connection)
-        })
+    var pool = poolModule.Pool({
+        name     : 'rethinkdb',
+        create   : function(done) {
+            r.connect(options, done)
+        },
+        destroy  : function(client) {
+            client.close()
+        },
+        max      : internals.options.maxConn || 25,
+        min      : internals.options.minConn || 3,
+        idleTimeoutMillis : internals.options.idleConn || 30000,
+        log : internals.options.logConn || false
     })
-    return d.promise
-}
 
-/*
- * Run -- takes rethinkdb query to run on the database.
- * Returns -- promise which resolves to json requested from db.
- *
- * It handles the cursors and array transformations nicely so
- * you don't have to deal with them.
-*/
+    var acq = Promise.promisify(pool.acquire)
 
-function run(query) {
-    var d = q.defer()
-    query.run(helper.connection, function(err, cursor) {
-        if (err) d.reject(err)
-        else {
-            // If cursor can be converted to array, do that
-            if (cursor && cursor.toArray) {
-                cursor.toArray(function(err, results) {
-                    if (err) rethinkError(err, d)
-                    else d.resolve(results)
-                })
+    var acquire = function() {
+        return acq().disposer(function(connection) {
+            var e
+            try {
+                return pool.release(connection)
+            } catch (_error) {
+                e = _error
+                return debug('failed to release connection %s', e.message)
             }
-            // Else just resolve to the json we have
-            else d.resolve(cursor)
-        }
-    })
-    return d.promise
-}
+        })
+    }
 
-function rethinkError(error, defer) {
-    if (defer) defer.reject(error)
-    console.log('rethinkdb-helper error', error)
+    var run = function(query, done) {
+        var promise = Promise.using(acquire(), function(connection) {
+            return query.run(connection).then(function(cursorOrResult) {
+                return (cursorOrResult != null ? typeof cursorOrResult.toArray === "function" ? cursorOrResult.toArray() : void 0 : void 0) || cursorOrResult
+            })
+        })
+        if (done != null) {
+            return promise.nodeify(done)
+        } else {
+            return promise
+        }
+    }
+
+    var setupDb = function() {
+        return new Promise(function(resolve, reject) {
+            internals.run(internals.pool.r.dbCreate(internals.options.db)).then(function(err, result) {
+                // Ignore error, it's probably an 'already created' error
+                resolve()
+            })
+            .catch(function(err) {return null})
+        })
+    }
+
+    pool.r = r
+    pool.Promise = Promise
+
+    internals.pool = pool
+    internals.run = run
+    internals.setupDb = setupDb
+
+    return internals
 }
 
 exports.init = init;
