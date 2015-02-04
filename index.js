@@ -56,11 +56,11 @@ function init(driver, options) {
 
     var setupDb = function() {
         return new Promise(function(resolve, reject) {
-            internals.run(internals.pool.r.dbCreate(internals.options.db)).then(function(err, result) {
+            run(r.dbCreate(internals.options.db)).then(function(err, result) {
                 // Ignore error, it's probably an 'already created' error
                 resolve()
             })
-            .catch(function(err) {return null})
+            .catch(function(err) {resolve()})
         })
     }
 
