@@ -1,3 +1,5 @@
+# FYI need to update README, changes from fork. 
+
 # Rethinkdb Connection Helper
 
 This is a simple rethinkdb node tool to easily manage a connection, run queries, handle cursors, etc.
