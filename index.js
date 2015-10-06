@@ -41,9 +41,9 @@ function init(driver, options) {
         })
     }
 
-    var run = function(query, done) {
+    var run = function(query, done, options) {
         var promise = Promise.using(acquire(), function(connection) {
-            return query.run(connection).then(function(cursorOrResult) {
+            return query.run(connection, options).then(function(cursorOrResult) {
                 return (cursorOrResult != null ? typeof cursorOrResult.toArray === "function" ? cursorOrResult.toArray() : void 0 : void 0) || cursorOrResult
             })
         })

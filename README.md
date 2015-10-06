@@ -1,4 +1,4 @@
-# FYI need to update README, changes from fork. 
+# FYI need to update README, changes from fork.
 
 # Rethinkdb Connection Helper
 
@@ -44,9 +44,12 @@ Takes no arguments. Establishes the connection to the db.
 
 Returns: Promise, which resolves to actual connection.
 
-## connection.run(query)
+## connection.run(query, [done], [options])
 
-Arguments: Any rethinkdb query.
+Arguments:
+    1. query (RethinkDbQuery) The query to be run.
+    2. [done] \(NodeCallbackFunction) If you don't like promises, use this callback.
+    3. [options] \(RethinkDbRunOptions) Any options you wish to pass to `run`.
 
 Returns: Promise, which resolves to JSON. It will handle the cursor for you, it will either return a single object (if asking for one object) or an array, whichever is applicable.
 
