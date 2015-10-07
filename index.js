@@ -3,9 +3,8 @@ var Promise = require('bluebird');
 var r;
 var helper;
 
-var internals = {};
-
 function init(driver, options) {
+    var internals = {};
     var defaultDb = 'test'
     internals.options = options || {}
     if (!driver) rethinkError('Please include the rethinkdb driver when calling init')
