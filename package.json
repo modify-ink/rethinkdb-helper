@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/isaachess/rethinkdb-helper",
   "dependencies": {
-    "generic-pool": "^2.1.1",
-    "bluebird": "^2.9.6"
+    "generic-pool": "2.1.1",
+    "bluebird": "2.9.6"
   },
   "devDependencies": {},
   "keywords": [
